@@ -8,5 +8,10 @@
     }
   ],
   "apps": [],
-  "servers": []
+  "servers": [
+    {
+      "id": 1,
+      "serverName": "server1"
+    }
+  ]
 }

@@ -55,12 +55,12 @@ export const mutations = {
     const deletedServer = state.servers.splice(index, 1)[0];
     state.tasks.forEach((task) => {
       if (task.servers === deletedServer.serverName) {
-        delete task.servers;
+        state.tasks.splice(task, 1);
       }
     });
     state.application.forEach((app) => {
       if (app.applicationId === index) {
-        delete app.servers;
+        state.application.splice(app, 1);
       }
     });
   },

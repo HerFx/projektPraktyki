@@ -66,9 +66,6 @@ export default {
       ];
     },
     store() {
-      this.$store.getters["getTask"].map((t) => {
-        console.log(t);
-      });
       return this.$store.getters["getTask"];
     },
     appOptions() {

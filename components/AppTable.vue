@@ -33,12 +33,8 @@
           <td class="text-center">{{ item.application }}</td>
           <td class="text-center">{{ item.servers }}</td>
           <td class="btn-box text-center">
-            <v-btn class="edit-btn" @click="editItem(item)" :key="item.id"
-              >Edit</v-btn
-            >
-            <v-btn color="delete-btn" @click="deleteApp(item.id)" :key="item.id"
-              >Delete</v-btn
-            >
+            <v-btn class="edit-btn" @click="editItem(item)">Edit</v-btn>
+            <v-btn color="delete-btn" @click="deleteApp(item.id)">Delete</v-btn>
           </td>
         </tr>
       </template>

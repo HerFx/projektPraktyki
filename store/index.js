@@ -14,7 +14,6 @@ export const state = () => ({
 export const getters = {
   getTask: (state) => {
     state.tasks.map((task) => {
-      console.log(task.id);
       return task.id;
     });
     return state.tasks;
@@ -30,17 +29,14 @@ export const getters = {
 export const mutations = {
   updateTask: (state, tasks) => {
     tasks.id = uuidv4();
-    console.log(state.tasks);
-    console.log(state.tasks.length);
-    console.log(tasks);
     state.tasks.push(tasks);
   },
   updateApp: (state, application) => {
-    application.applicationId = uuidv4();
+    application.id = uuidv4();
     state.application.push(application);
   },
   updateServer: (state, servers) => {
-    servers.serverId = uuidv4();
+    servers.id = uuidv4();
     state.servers.push(servers);
   },
   deleteTask: (state, index) => {

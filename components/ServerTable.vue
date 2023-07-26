@@ -22,13 +22,8 @@
         <tr v-else>
           <td class="text-center">{{ item.serverName }}</td>
           <td class="btn-box text-center">
-            <v-btn class="edit-btn" @click="editItem(item)" :key="item.id"
-              >Edit</v-btn
-            >
-            <v-btn
-              color="delete-btn"
-              @click="deleteServer(item.id)"
-              :key="item.id"
+            <v-btn class="edit-btn" @click="editItem(item)">Edit</v-btn>
+            <v-btn color="delete-btn" @click="deleteServer(item.id)"
               >Delete</v-btn
             >
           </td>

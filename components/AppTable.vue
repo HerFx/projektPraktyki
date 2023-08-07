@@ -2,39 +2,48 @@
   <v-container>
     <v-data-table
       :headers="headers"
-      :items="appOptions"
+      :items="aplikacje"
       item-key="id"
       class="table-box"
-      :item-class="itemClass"
     >
       <template v-slot:item="{ item }">
-        <tr v-if="item.id === editingItemId">
+        <tr v-if="editingId === item.id">
           <td>
             <v-text-field
-              v-model="editedApp.application"
+              v-model="editedApp.name"
               class="text-center"
             ></v-text-field>
           </td>
           <td>
-            <select v-model="editedApp.servers" class="text-center">
-              <option v-for="(option, index) in appServer" :key="index">
-                {{ option.serverName }}
+            <select
+              v-model="editedApp.serwer"
+              class="text-center"
+              @change="updateSelectedServer"
+            >
+              <option value="" disabled>Select a server</option>
+              <option
+                v-for="server in serwery"
+                :key="server.id"
+                :value="server.name"
+              >
+                {{ server.name }}
               </option>
             </select>
           </td>
+
           <td class="btn-box">
-            <v-btn @click="saveEditedTask(item.id)" class="save-btn"
-              >Save</v-btn
-            >
-            <v-btn @click="close()" class="close-btn">Close</v-btn>
+            <v-btn @click="saveApp(item)" class="save-btn">Save</v-btn>
+            <v-btn @click="editingId = null" class="close-btn">Close</v-btn>
           </td>
         </tr>
         <tr v-else>
-          <td class="text-center">{{ item.application }}</td>
-          <td class="text-center">{{ item.servers }}</td>
+          <td class="text-center">{{ item.name }}</td>
+          <td class="text-center">{{ item.serwer }}</td>
           <td class="btn-box text-center">
-            <v-btn class="edit-btn" @click="editItem(item)">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteApp(item.id)">Delete</v-btn>
+            <v-btn @click="startEditing(item)" class="edit-btn">Edit</v-btn>
+            <v-btn color="delete-btn" @click="deleteApplication(item.id)"
+              >Delete</v-btn
+            >
           </td>
         </tr>
       </template>
@@ -43,65 +52,74 @@
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
+
 export default {
-  name: "TaskTable",
+  name: "ApplicationTable",
+  data() {
+    return {
+      editedApp: {
+        name: "",
+        serwer: "",
+        serwerId: "",
+      },
+      editingId: null,
+    };
+  },
   computed: {
     headers() {
       return [
-        { text: "Application", value: "selectedOption", align: "center" },
+        { text: "Application", value: "applications", align: "center" },
         { text: "Server", value: "servers", align: "center" },
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
-    appOptions() {
-      return this.$store.getters["getApp"];
-    },
-    appServer() {
-      return this.$store.getters["getServer"];
-    },
+    ...mapState(["aplikacje", "serwery"]),
   },
   methods: {
-    deleteApp(appId) {
-      this.$store.dispatch("delateAppIndex", appId);
-    },
-    editItem(item) {
-      this.editingItemId = item.id;
+    ...mapActions([
+      "deleteApplication",
+      "editApplication",
+      "fetchApplications",
+      "fetchSerwery",
+    ]),
+
+    startEditing(item) {
       this.editedApp = { ...item };
+      this.editingId = item.id;
     },
-    saveEditedTask(oldAppId) {
-      this.$store.commit("deleteApp", oldAppId);
-      this.$store.commit("updateApp", this.editedApp);
-      this.editingItemId = null;
-      this.editedApp = {
-        application: "",
-        servers: "",
-      };
+    updateSelectedServer() {
+      const selectedServer = this.serwery.find(
+        (server) => server.name === this.editedApp.serwer
+      );
+      if (selectedServer) {
+        this.editedApp.serwer = selectedServer.name;
+        this.editedApp.serwerId = selectedServer.id;
+      } else {
+        console.error("Selected server not found.");
+      }
     },
-    close() {
-      this.editingItemId = null;
-      this.editedApp = {
-        application: "",
-        servers: "",
-      };
-    },
-    itemClass(item) {
-      return item.id === this.editingItemId ? "editing-row" : "";
+    async saveApp() {
+      try {
+        this.updateSelectedServer();
+
+        await this.editApplication(this.editedApp);
+        console.log("editedApp:", this.editedApp);
+        this.editingId = null;
+      } catch (error) {
+        console.error("Error editing App:", error);
+      }
     },
   },
-  data() {
-    return {
-      editingItemId: null,
-      editedApp: {
-        application: "",
-        servers: "",
-      },
-    };
+  created() {
+    this.fetchApplications();
+    this.fetchSerwery();
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .table-box tr:hover:not(.editing-row) {
-  background-color: #333 !important; /* Kolor podświetlenia po najechaniu na wiersz (z wyjątkiem edytowanego wiersza) */
+  background-color: #333 !important;
 }
 </style>

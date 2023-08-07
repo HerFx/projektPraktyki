@@ -1,17 +1,5 @@
 {
-  "tasks": [
-    {
-      "id": 1,
-      "taskTitle": "task1",
-      "serverName": "server1",
-      "application": "app1"
-    }
-  ],
+  "tasks": [],
   "apps": [],
-  "servers": [
-    {
-      "id": 1,
-      "serverName": "server1"
-    }
-  ]
+  "serwery": ["test"]
 }

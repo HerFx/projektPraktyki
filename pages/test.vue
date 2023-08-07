@@ -2,7 +2,7 @@
   <v-container>
     <v-data-table
       :headers="headers"
-      :items="serwery"
+      :items="tasks"
       item-key="id"
       class="table-box"
     >
@@ -10,22 +10,26 @@
         <tr v-if="editingId === item.id">
           <td>
             <v-text-field
-              v-model="editedServer.name"
-              @keyup.enter="saveServer(item)"
-              @blur="saveServer(item)"
+              v-model="editedTask.name"
+              @keyup.enter="saveApp(item)"
+              @blur="saveTask(item)"
               class="text-center"
             ></v-text-field>
           </td>
+          <td class="text-center">{{ item.application }}</td>
+          <td class="text-center">{{ item.serwer }}</td>
           <td class="btn-box">
-            <v-btn @click="saveServer(item)" class="save-btn">Save</v-btn>
+            <v-btn @click="saveTask(item)" class="save-btn">Save</v-btn>
             <v-btn @click="editingId = null" class="close-btn">Close</v-btn>
           </td>
         </tr>
         <tr v-else>
           <td class="text-center">{{ item.name }}</td>
+          <td class="text-center">{{ item.application }}</td>
+          <td class="text-center">{{ item.serwer }}</td>
           <td class="btn-box text-center">
             <v-btn @click="startEditing(item)" class="edit-btn">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteServer(item.id)"
+            <v-btn color="delete-btn" @click="deleteTask(item.id)"
               >Delete</v-btn
             >
           </td>
@@ -37,41 +41,42 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-
 export default {
-  name: "ServerTable",
+  name: "ApplicationTable",
+  created() {
+    this.fetchTasks();
+  },
   data() {
     return {
-      editedServer: {},
+      editedTask: {},
       editingId: null,
     };
   },
   computed: {
     headers() {
       return [
+        { text: "Task", value: "task", align: "center" },
+        { text: "Application", value: "applications", align: "center" },
         { text: "Server", value: "servers", align: "center" },
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
-    ...mapState(["serwery"]),
+    ...mapState(["tasks"]),
   },
   methods: {
-    ...mapActions(["deleteServer", "editServer", "fetchSerwery"]),
+    ...mapActions(["fetchTasks", "deleteTask", "editTask"]),
     startEditing(item) {
-      this.editedServer = { ...item };
+      this.editedTask = { ...item };
       this.editingId = item.id;
     },
-    async saveServer() {
+    async saveTask() {
       try {
-        await this.editServer(this.editedServer);
+        await this.editTask(this.editedTask);
         this.editingId = null;
       } catch (error) {
-        console.error("Błąd podczas zapisywania serwera:", error);
+        console.error("Błąd podczas zapisywania tasku:", error);
       }
     },
-  },
-  created() {
-    this.fetchSerwery();
   },
 };
 </script>

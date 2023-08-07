@@ -16,7 +16,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .bg {
   background-image: url(~/assets/app.jpg);
   background-size: cover;

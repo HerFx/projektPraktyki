@@ -94,8 +94,8 @@ export const actions = {
         throw new Error("Nie udało się usunąć serwera");
       }
       commit("DELETE_SERVER", serverId);
-      await this.dispatch("deleteApplicationsByServerId", serverId);
-      await this.dispatch("deleteTasksByServerId", serverId);
+      // await this.dispatch("deleteApplicationsByServerId", serverId);
+      // await this.dispatch("deleteTasksByServerId", serverId);
     } catch (error) {
       console.error("Błąd podczas usuwania serwera:", error);
     }
@@ -321,56 +321,56 @@ export const actions = {
     }
   },
 
-  async deleteApplicationsByServerId({ commit, state }, serverId) {
-    try {
-      const applicationsToDelete = state.aplikacje.filter(
-        (application) => application.serwerId === serverId
-      );
+  // async deleteApplicationsByServerId({ commit, state }, serverId) {
+  //   try {
+  //     const applicationsToDelete = state.aplikacje.filter(
+  //       (application) => application.serwerId === serverId
+  //     );
 
-      // Loop through the applications to delete them one by one
-      for (const application of applicationsToDelete) {
-        const url = process.env.apiUrl + "/application/" + application.id;
-        const response = await fetch(url, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  //     // Loop through the applications to delete them one by one
+  //     for (const application of applicationsToDelete) {
+  //       const url = process.env.apiUrl + "/application/" + application.id;
+  //       const response = await fetch(url, {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
 
-        if (!response.ok) {
-          throw new Error("Nie udało się usunąć aplikacji");
-        }
+  //       if (!response.ok) {
+  //         throw new Error("Nie udało się usunąć aplikacji");
+  //       }
 
-        commit("DELETE_APPLICATION", application.id);
-      }
-    } catch (error) {
-      console.error("Błąd podczas usuwania aplikacji:", error);
-    }
-  },
-  async deleteTasksByServerId({ commit, state }, serverId) {
-    try {
-      const tasksToDelete = state.tasks.filter(
-        (task) => task.serwerId === serverId
-      );
+  //       commit("DELETE_APPLICATION", application.id);
+  //     }
+  //   } catch (error) {
+  //     console.error("Błąd podczas usuwania aplikacji:", error);
+  //   }
+  // },
+  // async deleteTasksByServerId({ commit, state }, serverId) {
+  //   try {
+  //     const tasksToDelete = state.tasks.filter(
+  //       (task) => task.serwerId === serverId
+  //     );
 
-      // Loop through the tasks to delete them one by one
-      for (const task of tasksToDelete) {
-        const url = process.env.apiUrl + "/task/" + task.id;
-        const response = await fetch(url, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  //     // Loop through the tasks to delete them one by one
+  //     for (const task of tasksToDelete) {
+  //       const url = process.env.apiUrl + "/task/" + task.id;
+  //       const response = await fetch(url, {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
 
-        if (!response.ok) {
-          throw new Error("Nie udało się usunąć zadania");
-        }
+  //       if (!response.ok) {
+  //         throw new Error("Nie udało się usunąć zadania");
+  //       }
 
-        commit("DELETE_TASK", task.id);
-      }
-    } catch (error) {
-      console.error("Błąd podczas usuwania zadania:", error);
-    }
-  },
+  //       commit("DELETE_TASK", task.id);
+  //     }
+  //   } catch (error) {
+  //     console.error("Błąd podczas usuwania zadania:", error);
+  //   }
+  // },
 };

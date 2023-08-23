@@ -69,19 +69,25 @@
             </select>
           </td>
           <td class="btn-box">
-            <v-btn @click="saveTask(item)" class="save-btn">Save</v-btn>
-            <v-btn @click="editingId = null" class="close-btn">Close</v-btn>
+            <v-icon small @click="saveTask(item)">mdi-check</v-icon>
+            <v-icon small @click="editingId = null">mdi-close</v-icon>
           </td>
         </tr>
         <tr v-else>
           <td class="text-center">{{ item.name }}</td>
-          <td class="text-center">{{ item.application }}</td>
-          <td class="text-center">{{ item.serwer }}</td>
-          <td class="btn-box text-center">
-            <v-btn @click="startEditing(item)" class="edit-btn">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteTask(item.id)"
-              >Delete</v-btn
-            >
+          <td class="text-center">
+            <v-chip :class="getChipClass(item.application)">{{
+              item.application
+            }}</v-chip>
+          </td>
+          <td class="text-center">
+            <v-chip dark class="chip">
+              {{ item.serwer }}
+            </v-chip>
+          </td>
+          <td class="btn-box">
+            <v-icon small @click="startEditing(item)">mdi-pencil</v-icon>
+            <v-icon small @click="deleteTask(item.id)">mdi-delete</v-icon>
           </td>
         </tr>
       </template>
@@ -96,6 +102,7 @@ export default {
   created() {
     this.fetchTasks();
     this.fetchApplications();
+    this.fetchSerwery();
   },
   data() {
     return {
@@ -146,6 +153,7 @@ export default {
   methods: {
     ...mapActions([
       "fetchTasks",
+      "fetchSerwery",
       "deleteTask",
       "editTask",
       "fetchApplications",
@@ -189,11 +197,29 @@ export default {
         console.error("Błąd podczas zapisywania tasku:", error);
       }
     },
+    getChipClass(application) {
+      if (application === "-") {
+        return "red-chip";
+      } else {
+        return "blue-chip";
+      }
+    },
   },
 };
 </script>
 
 <style lang="css" scoped>
+.red-chip {
+  background-color: red !important;
+  color: white;
+  padding: 1rem 1.2rem;
+  font-weight: bolder;
+}
+
+.blue-chip {
+  background-color: blue !important;
+  color: white;
+}
 .table-box tr:hover:not(.editing-row) {
   background-color: #333 !important;
 }
@@ -210,6 +236,11 @@ export default {
 }
 
 .filter_select option {
+  color: #fff !important;
+}
+
+.chip {
+  background-color: rgb(5, 126, 31) !important;
   color: #fff !important;
 }
 

@@ -13,21 +13,19 @@
               v-model="editedServer.name"
               @keyup.enter="saveServer(item)"
               @blur="saveServer(item)"
-              class="text-center"
+              class="text-center edit-name"
             ></v-text-field>
           </td>
           <td class="btn-box">
-            <v-btn @click="saveServer(item)" class="save-btn">Save</v-btn>
-            <v-btn @click="editingId = null" class="close-btn">Close</v-btn>
+            <v-icon small @click="saveServer(item)">mdi-check</v-icon>
+            <v-icon small @click="editingId = null">mdi-close</v-icon>
           </td>
         </tr>
         <tr v-else>
           <td class="text-center">{{ item.name }}</td>
-          <td class="btn-box text-center">
-            <v-btn @click="startEditing(item)" class="edit-btn">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteServer(item.id)"
-              >Delete</v-btn
-            >
+          <td class="btn-box">
+            <v-icon small @click="startEditing(item)">mdi-pencil</v-icon>
+            <v-icon small @click="deleteServer(item.id)">mdi-delete</v-icon>
           </td>
         </tr>
       </template>

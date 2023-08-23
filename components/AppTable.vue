@@ -42,17 +42,17 @@
           </td>
 
           <td class="btn-box">
-            <v-btn @click="saveApp(item)" class="save-btn">Save</v-btn>
-            <v-btn @click="editingId = null" class="close-btn">Close</v-btn>
+            <v-icon small @click="saveApp(item)">mdi-check</v-icon>
+            <v-icon small @click="editingId = null">mdi-close</v-icon>
           </td>
         </tr>
         <tr v-else>
           <td class="text-center">{{ item.name }}</td>
           <td class="text-center">{{ item.serwer }}</td>
-          <td class="btn-box text-center">
-            <v-btn @click="startEditing(item)" class="edit-btn">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteApplication(item.id)"
-              >Delete</v-btn
+          <td class="btn-box">
+            <v-icon small @click="startEditing(item)">mdi-pencil</v-icon>
+            <v-icon small @click="deleteApplication(item.id)"
+              >mdi-delete</v-icon
             >
           </td>
         </tr>

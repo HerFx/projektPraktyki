@@ -60,7 +60,7 @@ export default {
           serwerId: wybranySerwer.id,
           serwer: wybranySerwer.name,
           applicationId: wybranaAplikacja ? wybranaAplikacja.id : 0,
-          application: wybranaAplikacja ? wybranaAplikacja.name : "",
+          application: wybranaAplikacja ? wybranaAplikacja.name : "-",
         };
 
         console.log("newTaskData before sending:", newTaskData);

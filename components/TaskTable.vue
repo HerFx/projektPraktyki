@@ -1,8 +1,28 @@
 <template>
   <v-container>
+    <v-container fluid>
+      <h2>Filter</h2>
+      <label>Server:</label>
+      <select class="filter_select" v-model="selectedServerFilter">
+        <option value="">All</option>
+        <option v-for="item in serwery" :key="item.id" :value="item">
+          {{ item.name }}
+        </option>
+      </select>
+      <label>Application:</label>
+      <select class="filter_select" v-model="selectedApplicationFilter">
+        <option value="">All</option>
+        <option v-for="item in aplikacje" :key="item.id" :value="item">
+          {{ item.name }}
+        </option>
+        <option value="-">None</option>
+      </select>
+    </v-container>
     <v-data-table
       :headers="headers"
-      :items="tasks"
+      :items="filteredTasks"
+      :items-per-page="5"
+      loading
       item-key="id"
       class="table-box"
     >
@@ -87,6 +107,8 @@ export default {
         serwerId: "",
       },
       editingId: null,
+      selectedApplicationFilter: "",
+      selectedServerFilter: "",
     };
   },
   computed: {
@@ -99,6 +121,27 @@ export default {
       ];
     },
     ...mapState(["tasks", "aplikacje", "serwery"]),
+    filteredTasks() {
+      let filtered = this.tasks;
+
+      if (
+        this.selectedApplicationFilter &&
+        this.selectedApplicationFilter !== "-"
+      ) {
+        filtered = filtered.filter(
+          (task) => task.application === this.selectedApplicationFilter.name
+        );
+      } else if (this.selectedApplicationFilter === "-") {
+        filtered = filtered.filter(
+          (task) => !task.application || task.application === "-"
+        );
+      } else if (this.selectedServerFilter) {
+        filtered = filtered.filter(
+          (task) => task.serwer === this.selectedServerFilter.name
+        );
+      }
+      return filtered;
+    },
   },
   methods: {
     ...mapActions([
@@ -153,5 +196,24 @@ export default {
 <style lang="css" scoped>
 .table-box tr:hover:not(.editing-row) {
   background-color: #333 !important;
+}
+
+.filter_select {
+  width: 20%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  margin-right: 10px;
+  background-color: #333;
+}
+
+.filter_select option {
+  color: #fff !important;
+}
+
+label {
+  margin-right: 10px;
 }
 </style>

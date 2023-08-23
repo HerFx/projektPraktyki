@@ -373,4 +373,26 @@ export const actions = {
   //     console.error("Błąd podczas usuwania zadania:", error);
   //   }
   // },
+
+  //filter tasks by serverId
+  async fetchTasksByServerId({ commit }, serverId) {
+    try {
+      const url = process.env.apiUrl + "/task/" + serverId;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Nie udało się pobrać danych z serwera");
+      }
+
+      const tasks = await response.json();
+      commit("SET_TASKS", tasks);
+    } catch (error) {
+      console.error("Błąd podczas pobierania danych:", error);
+    }
+  },
 };

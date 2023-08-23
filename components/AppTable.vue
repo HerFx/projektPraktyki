@@ -1,8 +1,18 @@
 <template>
   <v-container>
+    <v-container fluid>
+      <h2>Filter</h2>
+      <label>Server:</label>
+      <select class="filter_select" v-model="selectedServerFilter">
+        <option value="">All</option>
+        <option v-for="item in serwery" :key="item.id" :value="item">
+          {{ item.name }}
+        </option>
+      </select>
+    </v-container>
     <v-data-table
       :headers="headers"
-      :items="aplikacje"
+      :items="filteredTasks"
       item-key="id"
       class="table-box"
     >
@@ -64,6 +74,7 @@ export default {
         serwerId: "",
       },
       editingId: null,
+      selectedServerFilter: "",
     };
   },
   computed: {
@@ -75,6 +86,17 @@ export default {
       ];
     },
     ...mapState(["aplikacje", "serwery"]),
+    filteredTasks() {
+      let filtered = this.aplikacje;
+
+      if (this.selectedServerFilter) {
+        filtered = filtered.filter(
+          (app) => app.serwer === this.selectedServerFilter.name
+        );
+      }
+
+      return filtered;
+    },
   },
   methods: {
     ...mapActions([
@@ -121,5 +143,24 @@ export default {
 <style lang="css" scoped>
 .table-box tr:hover:not(.editing-row) {
   background-color: #333 !important;
+}
+
+.filter_select {
+  width: 20%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  margin-right: 10px;
+  background-color: #333;
+}
+
+.filter_select option {
+  color: #fff !important;
+}
+
+label {
+  margin-right: 10px;
 }
 </style>

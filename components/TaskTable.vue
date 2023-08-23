@@ -121,10 +121,21 @@ export default {
   computed: {
     headers() {
       return [
-        { text: "Task", value: "task", align: "center" },
-        { text: "Application", value: "applications", align: "center" },
-        { text: "Server", value: "servers", align: "center" },
-        { text: "Actions", value: "actions", sortable: false, align: "center" },
+        { text: "Task", value: "task", align: "center", sortable: false },
+        {
+          text: "Application",
+          value: "applications",
+          align: "center",
+          sortable: false,
+        },
+        { text: "Server", value: "servers", align: "center", sortable: false },
+        {
+          text: "Actions",
+          value: "actions",
+          sortable: false,
+          align: "center",
+          sortable: false,
+        },
       ];
     },
     ...mapState(["tasks", "aplikacje", "serwery"]),

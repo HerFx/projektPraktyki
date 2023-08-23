@@ -3,6 +3,7 @@
     <v-data-table
       :headers="headers"
       :items="serwery"
+      :items-per-page="5"
       item-key="id"
       class="table-box"
     >
@@ -47,8 +48,14 @@ export default {
   computed: {
     headers() {
       return [
-        { text: "Server", value: "servers", align: "center" },
-        { text: "Actions", value: "actions", sortable: false, align: "center" },
+        { text: "Server", value: "servers", align: "center", sortable: false },
+        {
+          text: "Actions",
+          value: "actions",
+          sortable: false,
+          align: "center",
+          sortable: false,
+        },
       ];
     },
     ...mapState(["serwery"]),

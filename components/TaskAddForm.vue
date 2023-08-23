@@ -6,18 +6,19 @@
         label="Task Title"
         outlined
         required
+        :rules="rules"
         class="custom-input"
       ></v-text-field>
-      <select v-model="task.servers" outlined required>
+      <select v-model="task.servers" outlined required :rules="rules">
         <option value="" disabled>Select a server</option>
-        <option v-for="(option, index) in selectedServer" :key="index">
-          {{ option.serverName }}
+        <option v-for="(option, index) in serwery" :key="index">
+          {{ option.name }}
         </option>
       </select>
       <select v-model="task.selectedOption" outlined>
         <option value="" disabled>Select an application</option>
-        <option v-for="(option, index) in selectOptions" :key="index">
-          {{ option.application }}
+        <option v-for="(option, index) in aplikacje" :key="index">
+          {{ option.name }}
         </option>
       </select>
       <v-btn type="submit" color="primary">Add Task</v-btn>
@@ -26,38 +27,51 @@
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
 export default {
   name: "TaskAddForm",
   data() {
     return {
       task: {
         taskTitle: "",
-        selectedOption: "",
         servers: "",
+        selectedOption: "",
       },
+      rules: [(value) => !!value || "Required."],
     };
   },
-  methods: {
-    submitForm() {
-      if (!this.task.servers) {
-        alert("Please select a server");
-
-        return;
-      }
-      this.$store.commit("updateTask", this.task);
-      this.task = {
-        taskTitle: "",
-        selectedOption: "",
-        servers: "",
-      };
-    },
-  },
   computed: {
-    selectOptions() {
-      return this.$store.getters["getApp"];
-    },
-    selectedServer() {
-      return this.$store.getters["getServer"];
+    ...mapState(["serwery", "aplikacje"]),
+  },
+  methods: {
+    ...mapActions(["addTask"]),
+    async submitForm() {
+      const wybranySerwer = this.serwery.find(
+        (serwer) => serwer.name === this.task.servers
+      );
+
+      const wybranaAplikacja = this.aplikacje.find(
+        (aplikacja) => aplikacja.name === this.task.selectedOption
+      );
+
+      try {
+        const newTaskData = {
+          name: this.task.taskTitle,
+          serwerId: wybranySerwer.id,
+          serwer: wybranySerwer.name,
+          applicationId: wybranaAplikacja ? wybranaAplikacja.id : 0,
+          application: wybranaAplikacja ? wybranaAplikacja.name : "-",
+        };
+
+        console.log("newTaskData before sending:", newTaskData);
+        await this.addTask(newTaskData);
+
+        this.task.taskTitle = "";
+        this.task.servers = "";
+        this.task.selectedOption = "";
+      } catch (error) {
+        console.error("Error adding Task:", error);
+      }
     },
   },
 };

@@ -1,50 +1,93 @@
 <template>
   <v-container>
+    <v-container fluid>
+      <h2>Filter</h2>
+      <label>Server:</label>
+      <select class="filter_select" v-model="selectedServerFilter">
+        <option value="">All</option>
+        <option v-for="item in serwery" :key="item.id" :value="item">
+          {{ item.name }}
+        </option>
+      </select>
+      <label>Application:</label>
+      <select class="filter_select" v-model="selectedApplicationFilter">
+        <option value="">All</option>
+        <option v-for="item in aplikacje" :key="item.id" :value="item">
+          {{ item.name }}
+        </option>
+        <option value="-">None</option>
+      </select>
+    </v-container>
     <v-data-table
       :headers="headers"
-      :items="store"
+      :items="filteredTasks"
+      :items-per-page="5"
+      loading
       item-key="id"
       class="table-box"
-      :item-class="itemClass"
     >
       <template v-slot:item="{ item }">
-        <tr v-if="item.id === editingItemId">
+        <tr v-if="editingId === item.id">
           <td>
             <v-text-field
-              v-model="editedTask.taskTitle"
+              v-model="editedTask.name"
+              @keyup.enter="saveApp(item)"
+              @blur="saveTask(item)"
               class="text-center"
             ></v-text-field>
           </td>
           <td>
-            <select v-model="editedTask.selectedOption" class="text-center">
-              <option v-for="(option, index) in appOptions" :key="index">
-                {{ option.application }}
+            <select
+              v-model="editedTask.application"
+              class="text-center"
+              @change="updateSelectedApplication"
+            >
+              <option value="" disabled>Select an application</option>
+              <option
+                v-for="application in aplikacje"
+                :key="application.id"
+                :value="application.name"
+              >
+                {{ application.name }}
               </option>
             </select>
           </td>
           <td>
-            <select v-model="editedTask.servers" class="text-center">
-              <option v-for="(option, index) in appServer" :key="index">
-                {{ option.serverName }}
+            <select
+              v-model="editedTask.serwer"
+              class="text-center"
+              @change="updateSelectedServer"
+            >
+              <option value="" disabled>Select a server</option>
+              <option
+                v-for="server in serwery"
+                :key="server.id"
+                :value="server.name"
+              >
+                {{ server.name }}
               </option>
             </select>
           </td>
           <td class="btn-box">
-            <v-btn @click="saveEditedTask(item.id)" class="save-btn"
-              >Save</v-btn
-            >
-            <v-btn @click="close()" class="close-btn">Close</v-btn>
+            <v-icon small @click="saveTask(item)">mdi-check</v-icon>
+            <v-icon small @click="editingId = null">mdi-close</v-icon>
           </td>
         </tr>
         <tr v-else>
-          <td class="text-center">{{ item.taskTitle }}</td>
-          <td class="text-center">{{ item.selectedOption }}</td>
-          <td class="text-center">{{ item.servers }}</td>
+          <td class="text-center">{{ item.name }}</td>
+          <td class="text-center">
+            <v-chip :class="getChipClass(item.application)">{{
+              item.application
+            }}</v-chip>
+          </td>
+          <td class="text-center">
+            <v-chip dark class="chip">
+              {{ item.serwer }}
+            </v-chip>
+          </td>
           <td class="btn-box">
-            <v-btn class="edit-btn" @click="editItem(item)">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteTask(item.id)"
-              >Delete</v-btn
-            >
+            <v-icon small @click="startEditing(item)">mdi-pencil</v-icon>
+            <v-icon small @click="deleteTask(item.id)">mdi-delete</v-icon>
           </td>
         </tr>
       </template>
@@ -53,78 +96,155 @@
 </template>
 
 <script>
-import db from "/helpers/db.json";
+import { mapState, mapActions } from "vuex";
 export default {
-  name: "TaskTable",
+  name: "ApplicationTable",
+  created() {
+    this.fetchTasks();
+    this.fetchApplications();
+    this.fetchSerwery();
+  },
+  data() {
+    return {
+      editedTask: {
+        name: "",
+        application: "",
+        applicationId: "",
+        serwer: "",
+        serwerId: "",
+      },
+      editingId: null,
+      selectedApplicationFilter: "",
+      selectedServerFilter: "",
+    };
+  },
   computed: {
     headers() {
       return [
-        { text: "Task Title", value: "taskTitle", align: "center" },
-        { text: "Application", value: "selectedOption", align: "center" },
+        { text: "Task", value: "task", align: "center" },
+        { text: "Application", value: "applications", align: "center" },
         { text: "Server", value: "servers", align: "center" },
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
-    store() {
-      return this.$store.getters["getTask"];
-    },
-    appOptions() {
-      return this.$store.getters["getApp"];
-    },
-    appServer() {
-      return this.$store.getters["getServer"];
+    ...mapState(["tasks", "aplikacje", "serwery"]),
+    filteredTasks() {
+      let filtered = this.tasks;
+
+      if (
+        this.selectedApplicationFilter &&
+        this.selectedApplicationFilter !== "-"
+      ) {
+        filtered = filtered.filter(
+          (task) => task.application === this.selectedApplicationFilter.name
+        );
+      } else if (this.selectedApplicationFilter === "-") {
+        filtered = filtered.filter(
+          (task) => !task.application || task.application === "-"
+        );
+      } else if (this.selectedServerFilter) {
+        filtered = filtered.filter(
+          (task) => task.serwer === this.selectedServerFilter.name
+        );
+      }
+      return filtered;
     },
   },
   methods: {
-    deleteTask(taskId) {
-      this.$store.dispatch("delateTaskIndex", taskId);
-    },
-    editItem(item) {
-      this.editingItemId = item.id;
+    ...mapActions([
+      "fetchTasks",
+      "fetchSerwery",
+      "deleteTask",
+      "editTask",
+      "fetchApplications",
+    ]),
+    startEditing(item) {
       this.editedTask = { ...item };
+      this.editingId = item.id;
     },
-    saveEditedTask(oldTaskId) {
-      console.log(oldTaskId);
-      this.$store.commit("deleteTask", oldTaskId);
-      this.$store.commit("updateTask", this.editedTask);
-      this.editingItemId = null;
-      this.editedTask = {
-        taskTitle: "",
-        selectedOption: "",
-        servers: "",
-      };
+    updateSelectedApplication() {
+      const selectedApplication = this.aplikacje.find(
+        (app) => app.name === this.editedTask.application
+      );
+      if (selectedApplication) {
+        this.editedTask.application = selectedApplication.name;
+        this.editedTask.applicationId = selectedApplication.id;
+      } else {
+        console.error("Selected application not found.");
+      }
     },
-    close() {
-      this.editingItemId = null;
-      this.editedTask = {
-        taskTitle: "",
-        selectedOption: "",
-        servers: "",
-      };
+    updateSelectedServer() {
+      const selectedServer = this.serwery.find(
+        (server) => server.name === this.editedTask.serwer
+      );
+      if (selectedServer) {
+        this.editedTask.serwer = selectedServer.name;
+        this.editedTask.serwerId = selectedServer.id;
+      } else {
+        console.error("Selected server not found.");
+      }
     },
-    itemClass(item) {
-      return item.id === this.editingItemId ? "editing-row" : "";
+    async saveTask() {
+      try {
+        this.updateSelectedApplication();
+
+        this.updateSelectedServer();
+
+        await this.editTask(this.editedTask);
+        console.log("editedTask:", this.editedTask);
+        this.editingId = null;
+      } catch (error) {
+        console.error("Błąd podczas zapisywania tasku:", error);
+      }
+    },
+    getChipClass(application) {
+      if (application === "-") {
+        return "red-chip";
+      } else {
+        return "blue-chip";
+      }
     },
   },
-  data() {
-    return {
-      editingItemId: null,
-      // tasks: [],
-      editedTask: {
-        taskTitle: "",
-        selectedOption: "",
-        servers: "",
-      },
-    };
-  },
-  // created() {
-  //   this.tasks = db.tasks;
-  // },
 };
 </script>
 
 <style lang="css" scoped>
+.red-chip {
+  background-color: red !important;
+  color: white;
+  padding: 1rem 1.2rem;
+  font-weight: bolder;
+}
+
+.blue-chip {
+  background-color: blue !important;
+  color: white;
+}
 .table-box tr:hover:not(.editing-row) {
-  background-color: #333 !important; /* Kolor podświetlenia po najechaniu na wiersz (z wyjątkiem edytowanego wiersza) */
+  background-color: #333 !important;
+}
+
+.filter_select {
+  width: 20%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  margin-right: 10px;
+  background-color: #333;
+}
+
+.filter_select option {
+  color: #fff !important;
+}
+
+.chip {
+  background-color: rgb(5, 126, 31) !important;
+  color: #fff !important;
+}
+
+label {
+  margin-right: 10px;
 }
 </style>

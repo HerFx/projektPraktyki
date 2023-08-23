@@ -1,60 +1,53 @@
 <template>
   <v-container>
-    <v-form @submit.prevent="submitForm">
+    <v-form @submit.prevent="addServerToDatabase">
       <v-text-field
-        v-model="server.serverName"
-        label="Server"
-        required
+        v-model="serverName"
+        label="Server Name"
         outlined
+        :rules="serverNameRules"
       ></v-text-field>
-      <v-btn type="submit" color="primary">Add Server</v-btn>
+      <v-btn type="submit" block>Add Server</v-btn>
     </v-form>
   </v-container>
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
-  name: "ServerAddForm",
   data() {
     return {
-      server: {
-        serverName: "",
-      },
+      serverName: "",
+      serverNameRules: [
+        (value) => {
+          if (value) return true;
+          return "Server name is required.";
+        },
+      ],
     };
   },
   methods: {
-    submitForm() {
-      if (!this.server.serverName) {
-        alert("Please enter a server name");
-        return;
+    ...mapActions(["addServer"]),
+    async addServerToDatabase() {
+      try {
+        const newServerData = {
+          name: this.serverName,
+        };
+
+        if (!newServerData.name) {
+          return;
+        }
+        await this.addServer(newServerData);
+      } catch (error) {
+        console.error("Error adding server:", error);
       }
-      this.$store.commit("updateServer", this.server);
-      this.server = {
-        serverName: "",
-      };
-    },
-  },
-  computed: {
-    selectedServer() {
-      return this.$store.getters["getServer"];
     },
   },
 };
 </script>
-
 <style lang="css" scoped>
 button {
   background-color: #27d !important;
-}
-
-select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #fff;
-  font-size: 16px;
-  font-family: "Roboto", sans-serif;
-  color: #333;
-  border: 1px solid #fff;
 }
 </style>

@@ -1,16 +1,17 @@
 <template>
   <v-container>
-    <v-form @submit.prevent="submitForm">
+    <v-form @submit.prevent="addAppToDatabase">
       <v-text-field
-        v-model="app.application"
-        label="Aplication"
+        v-model="appName"
+        label="Application"
         required
         outlined
+        :rules="rules"
       ></v-text-field>
-      <select v-model="app.servers">
+      <select v-model="selectedServer" :rules="rules">
         <option value="" disabled>Select a server</option>
-        <option v-for="(option, index) in selectedServer" :key="index">
-          {{ option.serverName }}
+        <option v-for="server in serwery" :key="server.id">
+          {{ server.name }}
         </option>
       </select>
       <v-btn type="submit" color="primary">Add App</v-btn>
@@ -19,33 +20,49 @@
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
+
 export default {
   name: "AppAddForm",
   data() {
     return {
-      app: {
-        application: "",
-        servers: "",
-      },
+      appName: "",
+      selectedServer: "",
+      rules: [(value) => !!value || "Required."],
     };
   },
-  methods: {
-    submitForm() {
-      if (!this.app.servers) {
-        alert("Please select a server");
-
-        return;
-      }
-      this.$store.commit("updateApp", this.app);
-      this.app = {
-        application: "",
-        servers: "",
-      };
-    },
-  },
   computed: {
-    selectedServer() {
-      return this.$store.getters["getServer"];
+    ...mapState(["serwery"]),
+  },
+  methods: {
+    ...mapActions(["addApplication"]),
+    async addAppToDatabase() {
+      console.log("selectedServer:", this.selectedServer);
+
+      const wybranySerwer = this.serwery.find(
+        (serwer) => serwer.name === this.selectedServer
+      );
+
+      try {
+        const newAppData = {
+          name: this.appName,
+          serwerId: wybranySerwer.id,
+          serwer: wybranySerwer.name,
+        };
+
+        console.log("newAppData before sending:", newAppData);
+
+        if (!newAppData.name || !newAppData.serwerId) {
+          return;
+        }
+
+        await this.addApplication(newAppData);
+
+        this.appName = "";
+        this.selectedServer = "";
+      } catch (error) {
+        console.error("Error adding App:", error);
+      }
     },
   },
 };

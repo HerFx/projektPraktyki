@@ -2,30 +2,30 @@
   <v-container>
     <v-data-table
       :headers="headers"
-      :items="appOptions"
+      :items="serwery"
       item-key="id"
       class="table-box"
     >
       <template v-slot:item="{ item }">
-        <tr v-if="item.id === editingItemId">
+        <tr v-if="editingId === item.id">
           <td>
             <v-text-field
-              v-model="editedApp.serverName"
-              class="text-center"
+              v-model="editedServer.name"
+              @keyup.enter="saveServer(item)"
+              @blur="saveServer(item)"
+              class="text-center edit-name"
             ></v-text-field>
           </td>
           <td class="btn-box">
-            <v-btn @click="saveEdited(item.id)" class="save-btn">Save</v-btn>
-            <v-btn @click="close()" class="close-btn">Close</v-btn>
+            <v-icon small @click="saveServer(item)">mdi-check</v-icon>
+            <v-icon small @click="editingId = null">mdi-close</v-icon>
           </td>
         </tr>
         <tr v-else>
-          <td class="text-center">{{ item.serverName }}</td>
-          <td class="btn-box text-center">
-            <v-btn class="edit-btn" @click="editItem(item)">Edit</v-btn>
-            <v-btn color="delete-btn" @click="deleteServer(item.id)"
-              >Delete</v-btn
-            >
+          <td class="text-center">{{ item.name }}</td>
+          <td class="btn-box">
+            <v-icon small @click="startEditing(item)">mdi-pencil</v-icon>
+            <v-icon small @click="deleteServer(item.id)">mdi-delete</v-icon>
           </td>
         </tr>
       </template>
@@ -34,8 +34,16 @@
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
+
 export default {
   name: "ServerTable",
+  data() {
+    return {
+      editedServer: {},
+      editingId: null,
+    };
+  },
   computed: {
     headers() {
       return [
@@ -43,43 +51,31 @@ export default {
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
-    appOptions() {
-      return this.$store.getters["getServer"];
-    },
+    ...mapState(["serwery"]),
   },
   methods: {
-    deleteServer(taskId) {
-      this.$store.dispatch("deleteServerIndex", taskId);
+    ...mapActions(["deleteServer", "editServer", "fetchSerwery"]),
+    startEditing(item) {
+      this.editedServer = { ...item };
+      this.editingId = item.id;
     },
-    editItem(item) {
-      this.editingItemId = item.id;
-      this.editedApp = { ...item };
-    },
-    saveEdited(oldAppId) {
-      this.$store.commit("deleteServer", oldAppId);
-      this.$store.commit("updateServer", this.editedApp);
-      this.editingItemId = null;
-      this.editedApp = {
-        serverName: "",
-      };
-    },
-    close() {
-      this.editingItemId = null;
+    async saveServer() {
+      try {
+        await this.editServer(this.editedServer);
+        this.editingId = null;
+      } catch (error) {
+        console.error("Błąd podczas zapisywania serwera:", error);
+      }
     },
   },
-  data() {
-    return {
-      editingItemId: null,
-      editedApp: {
-        serverName: "",
-      },
-    };
+  created() {
+    this.fetchSerwery();
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .table-box tr:hover:not(.editing-row) {
-  background-color: #333 !important; /* Kolor podświetlenia po najechaniu na wiersz (z wyjątkiem edytowanego wiersza) */
+  background-color: #333 !important;
 }
 </style>

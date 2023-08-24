@@ -17,7 +17,6 @@ export default {};
 <style lang="css" scoped>
 nav {
   background-color: #222;
-  color: #fff;
   padding: 10px;
   box-shadow: 0 0 20px rgba(228, 226, 226, 0.61);
   display: flex;
@@ -46,13 +45,8 @@ nav ul li {
 }
 
 nav ul li a {
-  color: #fff;
   font-size: 1.3em;
   text-transform: uppercase;
-}
-
-nav ul li a:hover {
-  color: #ccc;
 }
 
 a {

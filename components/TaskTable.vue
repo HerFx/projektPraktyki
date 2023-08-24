@@ -222,14 +222,12 @@ export default {
 <style lang="css" scoped>
 .red-chip {
   background-color: red !important;
-  color: white;
   padding: 1rem 1.2rem;
   font-weight: bolder;
 }
 
 .blue-chip {
-  background-color: blue !important;
-  color: white;
+  background-color: rgb(5, 126, 31) !important;
 }
 .table-box tr:hover:not(.editing-row) {
   background-color: #333 !important;
@@ -251,8 +249,7 @@ export default {
 }
 
 .chip {
-  background-color: rgb(5, 126, 31) !important;
-  color: #fff !important;
+  background-color: blue !important;
 }
 
 label {
